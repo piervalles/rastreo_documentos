@@ -110,16 +110,51 @@ $rol = $_SESSION['usuario_rol'] ?? 'usuario';
     </main>
 </div>
 
-<!-- Sincronización Reactiva en Red Local (Revalidación al enfocar) -->
+<!-- Sincronización Reactiva en Red Local (Fase 6: Revalidación al enfocar y Notificaciones Flotantes) -->
+<div id="toast-notificacion" style="display: none; position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #ffffff; border-left: 4px solid #3b82f6; border-radius: 10px; padding: 16px 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); z-index: 9999; max-width: 360px; font-size: 13px; animation: slideUp 0.3s ease;">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+        <div>
+            <strong style="color: #60a5fa; display: block; margin-bottom: 4px;">🔔 ¡Nuevo Documento en tu Área!</strong>
+            <p id="toast-mensaje" style="margin: 0; color: #cbd5e1; font-size: 12px;"></p>
+        </div>
+        <button onclick="document.getElementById('toast-notificacion').style.display='none'" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:16px;">&times;</button>
+    </div>
+    <div style="margin-top: 10px; text-align: right;">
+        <button onclick="window.location.reload()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 3px 8px;">Ver Documentos</button>
+    </div>
+</div>
+
 <script>
+    // 1. Revalidación al enfocar la pestaña
     let ultimaInteraccion = Date.now();
     window.addEventListener('focus', function() {
-        // Si el usuario vuelve a la pestaña tras más de 2 minutos de inactividad, refrescar para datos frescos
         if (Date.now() - ultimaInteraccion > 120000) {
             window.location.reload();
         }
         ultimaInteraccion = Date.now();
     });
+
+    // 2. Sondeo en segundo plano cada 12 segundos para avisar pases entre oficinas
+    let ultimoTimestamp = '<?= date("Y-m-d H:i:s") ?>';
+
+    setInterval(function() {
+        fetch('index.php?c=documentos&a=comprobarNovedades&desde=' + encodeURIComponent(ultimoTimestamp))
+            .then(res => res.json())
+            .then(data => {
+                if (data.timestamp) {
+                    ultimoTimestamp = data.timestamp;
+                }
+                if (data.nuevos > 0) {
+                    const toast = document.getElementById('toast-notificacion');
+                    const msg = document.getElementById('toast-mensaje');
+                    msg.innerHTML = `Llegó <strong>${data.folio}</strong> desde <em>${data.origen}</em>:<br>${data.asunto}`;
+                    toast.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                // Silencioso en caso de pérdida momentánea de red
+            });
+    }, 12000);
 </script>
 
 </body>

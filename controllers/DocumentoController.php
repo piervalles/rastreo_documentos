@@ -117,4 +117,50 @@ class DocumentoController {
 
         require __DIR__ . '/../views/documentos/ver.php';
     }
+
+    /**
+     * Endpoint API JSON para sincronización reactiva en segundo plano (Fase 6)
+     */
+    public function comprobarNovedades(): void {
+        header('Content-Type: application/json');
+
+        $deptoId = $_SESSION['departamento_id'] ?? null;
+        $desde = $_GET['desde'] ?? date('Y-m-d H:i:s', time() - 30);
+
+        if (!$deptoId) {
+            echo json_encode(['nuevos' => 0]);
+            exit;
+        }
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("
+            SELECT m.id, m.fecha_registro, d.folio_unico, d.asunto, orig.nombre AS depto_origen
+            FROM movimientos_bitacora m
+            INNER JOIN documentos d ON m.documento_id = d.id
+            INNER JOIN departamentos orig ON m.departamento_origen_id = orig.id
+            WHERE m.departamento_destino_id = :depto_id
+              AND m.departamento_origen_id != :depto_id
+              AND m.fecha_registro > :desde
+            ORDER BY m.id DESC
+            LIMIT 1
+        ");
+        $stmt->execute([
+            'depto_id' => $deptoId,
+            'desde'    => $desde
+        ]);
+        $novedad = $stmt->fetch();
+
+        if ($novedad) {
+            echo json_encode([
+                'nuevos'        => 1,
+                'folio'         => $novedad['folio_unico'],
+                'asunto'        => $novedad['asunto'],
+                'origen'        => $novedad['depto_origen'],
+                'timestamp'     => $novedad['fecha_registro']
+            ]);
+        } else {
+            echo json_encode(['nuevos' => 0, 'timestamp' => date('Y-m-d H:i:s')]);
+        }
+        exit;
+    }
 }
