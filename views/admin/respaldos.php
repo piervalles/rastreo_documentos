@@ -47,7 +47,3 @@ $titulo = "Copias de Seguridad (Respaldos)";
         </div>
     </div>
 </div>
-
-<?php
-$vistaHija = __DIR__ . '/respaldos.php';
-require_once __DIR__ . '/../layouts/main.php';

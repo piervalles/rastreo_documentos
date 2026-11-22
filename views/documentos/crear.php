@@ -133,7 +133,3 @@ $titulo = "Registrar Nuevo Documento Físico";
         </form>
     </div>
 </div>
-
-<?php
-$vistaHija = __DIR__ . '/crear.php';
-require_once __DIR__ . '/../layouts/main.php';

@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/../helpers/Seguridad.php';
+require_once __DIR__ . '/../helpers/View.php';
 
 class BackupController {
 
@@ -14,7 +15,7 @@ class BackupController {
     }
 
     public function index(): void {
-        require __DIR__ . '/../views/admin/respaldos.php';
+        View::render('admin/respaldos', [], 'Copias de Seguridad');
     }
 
     /**

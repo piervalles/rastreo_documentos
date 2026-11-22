@@ -256,7 +256,3 @@ $titulo = "Expediente: " . $documento['folio_unico'];
         </div>
     </div>
 </div>
-
-<?php
-$vistaHija = __DIR__ . '/ver.php';
-require_once __DIR__ . '/../layouts/main.php';

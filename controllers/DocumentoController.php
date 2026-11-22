@@ -8,6 +8,7 @@ require_once __DIR__ . '/../models/Movimiento.php';
 require_once __DIR__ . '/../models/Catalogo.php';
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../helpers/Seguridad.php';
+require_once __DIR__ . '/../helpers/View.php';
 
 class DocumentoController {
 
@@ -42,7 +43,7 @@ class DocumentoController {
         $estadosTramite = Catalogo::listarEstadosTramite(true);
         $estadosResolucion = Catalogo::listarEstadosResolucion(true);
 
-        require __DIR__ . '/../views/documentos/index.php';
+        View::render('documentos/index', compact('documentos', 'departamentos', 'estadosTramite', 'estadosResolucion'), 'Bandeja de Documentos');
     }
 
     /**
@@ -62,7 +63,7 @@ class DocumentoController {
             $docPadre = Documento::obtenerPorId((int)$docPadreId);
         }
 
-        require __DIR__ . '/../views/documentos/crear.php';
+        View::render('documentos/crear', compact('tipos', 'estadosTramite', 'estadosResolucion', 'departamentos', 'folioSugerido', 'docPadre'), 'Registrar Nuevo Documento Físico');
     }
 
     /**
@@ -115,7 +116,7 @@ class DocumentoController {
         $acciones = Catalogo::listarAcciones(true);
         $usuarios = Usuario::listar();
 
-        require __DIR__ . '/../views/documentos/ver.php';
+        View::render('documentos/ver', compact('documento', 'historial', 'documentosHijos', 'departamentos', 'estadosTramite', 'estadosResolucion', 'acciones', 'usuarios'), 'Expediente: ' . $documento['folio_unico']);
     }
 
     /**

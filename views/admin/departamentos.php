@@ -104,7 +104,3 @@ function limpiarFormDepto() {
     document.getElementById('depto_activo').checked = true;
 }
 </script>
-
-<?php
-$vistaHija = __DIR__ . '/departamentos.php';
-require_once __DIR__ . '/../layouts/main.php';

@@ -176,7 +176,3 @@ function editarER(item) {
     document.getElementById('er_activo').checked = (item.activo == 1);
 }
 </script>
-
-<?php
-$vistaHija = __DIR__ . '/estados.php';
-require_once __DIR__ . '/../layouts/main.php';

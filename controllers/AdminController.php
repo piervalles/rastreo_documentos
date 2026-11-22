@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../models/Catalogo.php';
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../helpers/Seguridad.php';
+require_once __DIR__ . '/../helpers/View.php';
 
 class AdminController {
 
@@ -18,7 +19,7 @@ class AdminController {
     // ==========================================
     public function departamentos(): void {
         $departamentos = Catalogo::listarDepartamentos(false);
-        require __DIR__ . '/../views/admin/departamentos.php';
+        View::render('admin/departamentos', compact('departamentos'), 'Áreas y Departamentos');
     }
 
     public function guardarDepartamento(): void {
@@ -39,7 +40,7 @@ class AdminController {
     public function estados(): void {
         $estadosTramite = Catalogo::listarEstadosTramite(false);
         $estadosResolucion = Catalogo::listarEstadosResolucion(false);
-        require __DIR__ . '/../views/admin/estados.php';
+        View::render('admin/estados', compact('estadosTramite', 'estadosResolucion'), 'Catálogos de Estados');
     }
 
     public function guardarEstadoTramite(): void {
@@ -68,7 +69,7 @@ class AdminController {
     public function usuarios(): void {
         $usuarios = Usuario::listar();
         $departamentos = Catalogo::listarDepartamentos(true);
-        require __DIR__ . '/../views/admin/usuarios.php';
+        View::render('admin/usuarios', compact('usuarios', 'departamentos'), 'Personal y Usuarios');
     }
 
     public function guardarUsuario(): void {

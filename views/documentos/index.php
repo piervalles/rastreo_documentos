@@ -149,7 +149,3 @@ $titulo = "Bandeja de Documentos";
         </table>
     </div>
 </div>
-
-<?php
-$vistaHija = __DIR__ . '/index.php';
-require_once __DIR__ . '/../layouts/main.php';

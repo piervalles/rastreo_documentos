@@ -146,7 +146,3 @@ function limpiarFormUsr() {
     document.getElementById('pwd_hint').innerText = '(Obligatoria para nuevos)';
 }
 </script>
-
-<?php
-$vistaHija = __DIR__ . '/usuarios.php';
-require_once __DIR__ . '/../layouts/main.php';
