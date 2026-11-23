@@ -15,8 +15,8 @@ $rol = $_SESSION['usuario_rol'] ?? 'usuario';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($titulo) ? e($titulo) . ' - ' : '' ?>DocuTrace</title>
-    <link rel="stylesheet" href="assets/css/app.css">
+    <title><?= isset($titulo) ? e($titulo) . ' - ' : '' ?>Gestión Documental</title>
+    <link rel="stylesheet" href="assets/css/app.css?v=<?= filemtime(__DIR__ . '/../../assets/css/app.css') ?>">
 </head>
 <body>
 
@@ -24,17 +24,21 @@ $rol = $_SESSION['usuario_rol'] ?? 'usuario';
     <!-- BARRA LATERAL (SIDEBAR) -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h2>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                DocuTrace
-            </h2>
-            <span>Rastreo y Trazabilidad Documental</span>
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h2>Gestión Documental</h2>
+                    <span>Rastreo y Trazabilidad</span>
+                </div>
+            </div>
         </div>
 
         <nav class="sidebar-menu">
@@ -73,8 +77,8 @@ $rol = $_SESSION['usuario_rol'] ?? 'usuario';
             <div class="user-badge">
                 <div class="user-avatar"><?= strtoupper(substr($usuarioNombre, 0, 1)) ?></div>
                 <div style="overflow: hidden;">
-                    <strong style="color: #ffffff; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><?= e($usuarioNombre) ?></strong>
-                    <span style="font-size: 11px;"><?= e($deptoNombre) ?> (<?= strtoupper($rol) ?>)</span>
+                    <strong class="user-name"><?= e($usuarioNombre) ?></strong>
+                    <span class="user-role"><?= e($deptoNombre) ?> (<?= strtoupper($rol) ?>)</span>
                 </div>
             </div>
             <a href="index.php?c=auth&a=logout" class="btn btn-secondary btn-sm" style="width: 100%;">
@@ -87,7 +91,7 @@ $rol = $_SESSION['usuario_rol'] ?? 'usuario';
     <!-- ÁREA PRINCIPAL -->
     <main class="main-content">
         <header class="topbar">
-            <h1 class="page-title"><?= isset($titulo) ? e($titulo) : 'DocuTrace' ?></h1>
+            <h1 class="page-title"><?= isset($titulo) ? e($titulo) : 'Gestión Documental' ?></h1>
             <div style="display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted);">
                 <span>Área: <strong><?= e($deptoNombre) ?></strong></span>
                 <span>•</span>

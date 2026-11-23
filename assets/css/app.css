@@ -32,10 +32,11 @@ a:hover { text-decoration: underline; }
 
 /* Layout */
 .app-container { display: flex; min-height: 100vh; }
+/* Sidebar Corporativo Formal (Light Enterprise Clean) */
 .sidebar { 
     width: var(--sidebar-width); 
-    background: #0f172a; 
-    color: #f8fafc; 
+    background: #ffffff; 
+    color: #334155; 
     display: flex; 
     flex-direction: column; 
     flex-shrink: 0; 
@@ -44,20 +45,175 @@ a:hover { text-decoration: underline; }
     height: 100vh; 
     overflow-y: auto; 
     z-index: 100;
+    border-right: 1px solid #e2e8f0;
 }
-.sidebar::-webkit-scrollbar { width: 5px; }
-.sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-.sidebar-header { padding: 22px 20px; border-bottom: 1px solid #1e293b; }
-.sidebar-header h2 { font-size: 16px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
-.sidebar-header span { font-size: 11px; color: #94a3b8; display: block; margin-top: 4px; }
-.sidebar-menu { padding: 16px 10px; flex-grow: 1; }
-.menu-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #64748b; padding: 10px 12px 4px; letter-spacing: 0.5px; }
-.menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #cbd5e1; border-radius: 8px; font-weight: 500; font-size: 13px; margin-bottom: 2px; transition: all 0.15s ease; text-decoration: none; }
-.menu-item:hover, .menu-item.active { background: #1e293b; color: #ffffff; text-decoration: none; }
-.menu-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-.sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 12px; color: #94a3b8; margin-top: auto; }
-.user-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #3b82f6; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+/* Cabecera del Sidebar */
+.sidebar-header { 
+    padding: 16px 18px; 
+    border-bottom: 1px solid #e2e8f0; 
+    background: #ffffff;
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+.brand-icon svg {
+    stroke: #2563eb;
+}
+.brand-text h2 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.2px;
+}
+.brand-text span {
+    font-size: 10.5px;
+    color: #64748b;
+    display: block;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* Menú de Navegación */
+.sidebar-menu { 
+    padding: 14px 10px; 
+    flex-grow: 1; 
+}
+.menu-label { 
+    font-size: 10px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    color: #94a3b8; 
+    padding: 14px 12px 6px; 
+    letter-spacing: 0.8px; 
+}
+.menu-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 8px 12px; 
+    color: #475569; 
+    border-radius: 6px; 
+    font-weight: 500; 
+    font-size: 13px; 
+    margin-bottom: 2px; 
+    transition: all 0.12s ease; 
+    text-decoration: none; 
+}
+.menu-item:hover { 
+    background: #f1f5f9; 
+    color: #0f172a; 
+    text-decoration: none; 
+}
+.menu-item.active { 
+    background: #eff6ff; 
+    color: #1d4ed8; 
+    font-weight: 600; 
+    text-decoration: none; 
+}
+.menu-item svg { 
+    width: 17px; 
+    height: 17px; 
+    stroke: #64748b; 
+    fill: none; 
+    stroke-width: 1.8; 
+    opacity: 0.9;
+    flex-shrink: 0;
+    transition: stroke 0.12s ease;
+}
+.menu-item:hover svg {
+    stroke: #0f172a;
+}
+.menu-item.active svg {
+    stroke: #2563eb;
+    opacity: 1;
+}
+
+/* Pie de Barra (Usuario y Sesión) */
+.sidebar-footer { 
+    padding: 14px 16px; 
+    border-top: 1px solid #e2e8f0; 
+    font-size: 12px; 
+    background: #f8fafc;
+    margin-top: auto; 
+}
+.user-badge { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 12px; 
+}
+.user-avatar { 
+    width: 32px; 
+    height: 32px; 
+    border-radius: 6px; 
+    background: #eff6ff; 
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 700; 
+    font-size: 13px; 
+    flex-shrink: 0;
+}
+.user-name {
+    color: #0f172a;
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.user-role {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.sidebar .btn-secondary {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 6px 12px;
+    transition: all 0.15s ease;
+}
+.sidebar .btn-secondary:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+    text-decoration: none;
+}
+.sidebar .btn-secondary svg {
+    stroke: currentColor;
+    opacity: 0.8;
+}
 
 .main-content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; overflow-x: hidden; }
 .topbar { background: var(--bg-surface); height: 60px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 90; }
