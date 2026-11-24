@@ -46,7 +46,7 @@ class AuthController {
             $_SESSION['usuario_login'] = $user['usuario'];
             $_SESSION['usuario_rol'] = $user['rol'];
             $_SESSION['departamento_id'] = $user['departamento_id'];
-            $_SESSION['departamento_nombre'] = $user['departamento_nombre'] ?? 'Sin Área Asignada';
+            $_SESSION['departamento_nombre'] = !empty($user['departamento_nombre']) ? $user['departamento_nombre'] : 'Sin área asignada';
 
             Seguridad::setFlash('success', "¡Bienvenido/a, {$user['nombre_completo']}!");
             header('Location: index.php?c=documentos&a=index');

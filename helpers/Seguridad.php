@@ -48,9 +48,39 @@ class Seguridad {
 
     /**
      * Exige que el usuario esté autenticado. Redirige a login si no lo está.
+     * Sincroniza en tiempo real los datos vigentes del usuario y su departamento con la BD.
      */
     public static function exigirAutenticado(): void {
         if (!isset($_SESSION['usuario_id'])) {
+            header('Location: index.php?c=auth&a=login');
+            exit;
+        }
+
+        self::sincronizarUsuarioSesion();
+    }
+
+    /**
+     * Sincroniza en cada petición los datos vigentes del usuario y su departamento
+     * para reflejar inmediatamente cualquier cambio realizado en la base de datos.
+     */
+    public static function sincronizarUsuarioSesion(): void {
+        if (empty($_SESSION['usuario_id'])) {
+            return;
+        }
+
+        require_once __DIR__ . '/../models/Usuario.php';
+        $user = Usuario::obtenerPorId((int)$_SESSION['usuario_id']);
+
+        if ($user && !empty($user['activo'])) {
+            $_SESSION['usuario_nombre'] = $user['nombre_completo'];
+            $_SESSION['usuario_login'] = $user['usuario'];
+            $_SESSION['usuario_rol'] = $user['rol'];
+            $_SESSION['departamento_id'] = $user['departamento_id'];
+            $_SESSION['departamento_nombre'] = !empty($user['departamento_nombre']) ? $user['departamento_nombre'] : 'Sin área asignada';
+        } elseif (!$user || empty($user['activo'])) {
+            // Usuario bloqueado o eliminado: forzar cierre de sesión seguro
+            $_SESSION = [];
+            session_destroy();
             header('Location: index.php?c=auth&a=login');
             exit;
         }

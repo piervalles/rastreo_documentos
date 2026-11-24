@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../helpers/Seguridad.php';
 $flash = Seguridad::getFlash();
 $esAdmin = Seguridad::esAdmin();
 $usuarioNombre = $_SESSION['usuario_nombre'] ?? 'Usuario';
-$deptoNombre = $_SESSION['departamento_nombre'] ?? 'General';
+$deptoNombre = !empty($_SESSION['departamento_nombre']) ? $_SESSION['departamento_nombre'] : 'Sin área asignada';
 $rol = $_SESSION['usuario_rol'] ?? 'usuario';
 ?>
 <!DOCTYPE html>

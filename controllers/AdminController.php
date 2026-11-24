@@ -114,6 +114,7 @@ class AdminController {
             $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;
             if ($id) {
                 Usuario::actualizar($id, $_POST);
+                Seguridad::sincronizarUsuarioSesion();
                 Seguridad::setFlash('success', 'Usuario actualizado correctamente.');
             } else {
                 Usuario::crear($_POST);
