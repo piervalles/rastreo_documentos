@@ -279,11 +279,6 @@ $flash = Seguridad::getFlash();
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
         </form>
-
-        <div class="demo-box">
-            <strong>Accesos Rápidos:</strong>
-            • <strong>Admin:</strong> <code>admin</code> / <code>admin123</code> | • <strong>Mesa de Partes:</strong> <code>mesapartes</code> / <code>usuario123</code>
-        </div>
     </div>
 </main>
 
