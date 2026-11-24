@@ -25,10 +25,47 @@ class AdminController {
     public function guardarDepartamento(): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && Seguridad::validarCsrf($_POST['csrf_token'] ?? '')) {
             $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;
-            Catalogo::guardarDepartamento($_POST, $id);
-            Seguridad::setFlash('success', 'Departamento guardado correctamente.');
+            $res = Catalogo::guardarDepartamento($_POST, $id);
+            if ($res['ok']) {
+                Seguridad::setFlash('success', $res['mensaje']);
+            } else {
+                Seguridad::setFlash('error', $res['mensaje']);
+            }
         } else {
-            Seguridad::setFlash('error', 'Error de seguridad al procesar la solicitud.');
+            Seguridad::setFlash('error', 'Error de seguridad al procesar la solicitud (Token CSRF inválido).');
+        }
+        header('Location: index.php?c=admin&a=departamentos');
+        exit;
+    }
+
+    public function eliminarDepartamento(): void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && Seguridad::validarCsrf($_POST['csrf_token'] ?? '')) {
+            $id = (int)($_POST['id'] ?? 0);
+            $res = Catalogo::eliminarDepartamento($id);
+            if ($res['ok']) {
+                Seguridad::setFlash('success', $res['mensaje']);
+            } else {
+                Seguridad::setFlash('error', $res['mensaje']);
+            }
+        } else {
+            Seguridad::setFlash('error', 'Token de seguridad inválido o petición no permitida.');
+        }
+        header('Location: index.php?c=admin&a=departamentos');
+        exit;
+    }
+
+    public function cambiarEstadoDepartamento(): void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && Seguridad::validarCsrf($_POST['csrf_token'] ?? '')) {
+            $id = (int)($_POST['id'] ?? 0);
+            $activo = (int)($_POST['activo'] ?? 0);
+            $res = Catalogo::cambiarEstadoDepartamento($id, $activo);
+            if ($res['ok']) {
+                Seguridad::setFlash('success', $res['mensaje']);
+            } else {
+                Seguridad::setFlash('error', $res['mensaje']);
+            }
+        } else {
+            Seguridad::setFlash('error', 'Token de seguridad inválido.');
         }
         header('Location: index.php?c=admin&a=departamentos');
         exit;

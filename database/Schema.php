@@ -15,6 +15,7 @@ class Schema {
                     codigo VARCHAR(20) NOT NULL UNIQUE,
                     descripcion VARCHAR(255) NULL,
                     activo TINYINT(1) DEFAULT 1,
+                    es_sistema TINYINT(1) DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX idx_depto_activo (activo),

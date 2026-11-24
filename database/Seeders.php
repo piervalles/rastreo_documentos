@@ -17,7 +17,7 @@ class Seeders {
             ['Recursos Humanos', 'RRHH', 'Gestión de personal y planillas'],
             ['Archivo Central', 'AC', 'Custodia y archivado definitivo de expedientes']
         ];
-        $stmtDepto = $pdo->prepare("INSERT IGNORE INTO departamentos (nombre, codigo, descripcion) VALUES (?, ?, ?)");
+        $stmtDepto = $pdo->prepare("INSERT IGNORE INTO departamentos (nombre, codigo, descripcion, es_sistema) VALUES (?, ?, ?, 1)");
         foreach ($deptos as $d) {
             $stmtDepto->execute($d);
         }
