@@ -186,11 +186,6 @@ class Documento {
             $params['buscar2'] = $termino;
         }
 
-        if (isset($filtros['asunto']) && trim($filtros['asunto']) !== '') {
-            $sql .= " AND LOWER(TRIM(d.asunto)) = LOWER(TRIM(:asunto))";
-            $params['asunto'] = trim($filtros['asunto']);
-        }
-
         if (!empty($filtros['estado_tramite_id'])) {
             $sql .= " AND d.estado_tramite_id = :est_tramite";
             $params['est_tramite'] = $filtros['estado_tramite_id'];
@@ -216,20 +211,5 @@ class Documento {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
-    }
-
-    /**
-     * Obtiene la lista única de asuntos registrados en los documentos
-     */
-    public static function listarAsuntosUnicos(): array {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->query("
-            SELECT MIN(TRIM(asunto)) AS asunto
-            FROM documentos
-            WHERE asunto IS NOT NULL AND TRIM(asunto) != ''
-            GROUP BY LOWER(TRIM(asunto))
-            ORDER BY asunto ASC
-        ");
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }

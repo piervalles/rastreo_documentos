@@ -32,7 +32,6 @@ class DocumentoController {
 
         $filtros = [
             'buscar'               => $_GET['buscar'] ?? null,
-            'asunto'               => $_GET['asunto'] ?? null,
             'estado_tramite_id'    => $_GET['estado_tramite_id'] ?? null,
             'estado_resolucion_id' => $_GET['estado_resolucion_id'] ?? null,
             'fecha_desde'          => $_GET['fecha_desde'] ?? null,
@@ -40,12 +39,11 @@ class DocumentoController {
         ];
 
         $documentos = Documento::listarBandeja($deptoId, $filtros);
-        $asuntos = Documento::listarAsuntosUnicos();
         $departamentos = Catalogo::listarDepartamentos(true);
         $estadosTramite = Catalogo::listarEstadosTramite(true);
         $estadosResolucion = Catalogo::listarEstadosResolucion(true);
 
-        View::render('documentos/index', compact('documentos', 'asuntos', 'departamentos', 'estadosTramite', 'estadosResolucion'), 'Bandeja de Documentos');
+        View::render('documentos/index', compact('documentos', 'departamentos', 'estadosTramite', 'estadosResolucion'), 'Bandeja de Documentos');
     }
 
     /**
