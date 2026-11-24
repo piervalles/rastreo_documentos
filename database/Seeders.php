@@ -27,7 +27,8 @@ class Seeders {
         $estadosTramite = [
             ['Recibido', 'emerald', 'Documento en poder físico de la oficina', 1],
             ['En traslado', 'amber', 'Documento en camino físico entre oficinas', 2],
-            ['En revisión', 'blue', 'En análisis o evaluación activa por el personal', 3],
+            ['Derivado', 'purple', 'Documento derivado o asignado a un personal específico para su atención', 3],
+            ['En revisión', 'blue', 'En análisis o evaluación activa por el personal', 4],
             ['Respondido', 'purple', 'Trámite con respuesta emitida o derivada', 4],
             ['Devuelto', 'rose', 'Devuelto al área de origen para subsanaciones', 5],
             ['Archivado', 'slate', 'Expediente concluido y en custodia pasiva', 6]
@@ -43,9 +44,10 @@ class Seeders {
             ['Pendiente', 'slate', 'Aún sin dictamen o evaluación final', 1],
             ['En Evaluación', 'blue', 'En estudio técnico o legal', 2],
             ['Observado', 'amber', 'Requiere correcciones o recaudos adicionales', 3],
-            ['Con Visto Bueno', 'cyan', 'Conformidad técnica intermedia otorgada', 4],
-            ['Autorizado / Aprobado', 'emerald', 'Resolución favorable o visto bueno final', 5],
-            ['Rechazado', 'rose', 'Denegado o no procedente', 6]
+            ['Derivado', 'purple', 'Expediente o trámite derivado a otra área o personal encargado', 4],
+            ['Con Visto Bueno', 'cyan', 'Conformidad técnica intermedia otorgada', 5],
+            ['Autorizado / Aprobado', 'emerald', 'Resolución favorable o visto bueno final', 6],
+            ['Rechazado', 'rose', 'Denegado o no procedente', 7]
         ];
         $stmtER = $pdo->prepare("INSERT IGNORE INTO estados_resolucion (nombre, color, descripcion, orden) VALUES (?, ?, ?, ?)");
         foreach ($estadosResolucion as $er) {
@@ -72,6 +74,7 @@ class Seeders {
             ['Registro Inicial', 'Creación e ingreso del documento al sistema', 0, 0],
             ['Recepción Física', 'Confirmación de entrega y tenencia física en mano', 0, 0],
             ['Derivación / Pase', 'Envío físico del documento hacia otra oficina', 0, 0],
+            ['Derivación a Personal', 'Asignación o pase del expediente a un personal o especialista encargado', 0, 0],
             ['Verificación de Sello Físico', 'Comprobación de sello húmedo/estampilla física reglamentaria', 1, 0],
             ['Verificación de Firma Física', 'Cotejo y comprobación de firma autógrafa', 0, 1],
             ['Observación Emitida', 'Se detecta un defecto formal o material en el expediente', 0, 0],

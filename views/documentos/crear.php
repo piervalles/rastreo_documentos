@@ -103,6 +103,19 @@ $titulo = "Registrar Nuevo Documento Físico";
                 </div>
             </div>
 
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label">
+                        👤 Derivado a / Personal Encargado (Nombre Completo):
+                        <span style="font-weight: normal; font-size: 12px; color: var(--text-muted);">(Opcional)</span>
+                    </label>
+                    <input type="text" name="persona_derivada" class="form-control" placeholder="Ej. Lic. Carlos Mendoza Flores / Ing. Roberto Paredes">
+                    <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+                        Si el documento ya fue derivado a un personal o especialista específico dentro del área para su atención u oficio, indica su nombre completo.
+                    </span>
+                </div>
+            </div>
+
             <div class="card" style="background: #fafafa; border: 1px solid var(--border-color); margin-top: 10px;">
                 <div class="card-body">
                     <label class="form-label">Comprobaciones Físicas del Papel:</label>
@@ -120,8 +133,8 @@ $titulo = "Registrar Nuevo Documento Físico";
             </div>
 
             <div class="form-group" style="margin-top: 16px;">
-                <label class="form-label">Observaciones o Notas de Ingreso (opcional):</label>
-                <textarea name="observaciones" class="form-control" rows="3" placeholder="Ej. Documento ingresado con 12 folios útiles y 1 CD adjunto en sobre cerrado."></textarea>
+                <label class="form-label">Observaciones o Notas de Ingreso / Derivación (opcional):</label>
+                <textarea name="observaciones" class="form-control" rows="3" placeholder="Ej. Derivado para informe técnico en un plazo de 3 días. Documento ingresado con 12 folios útiles y 1 CD adjunto en sobre cerrado."></textarea>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">

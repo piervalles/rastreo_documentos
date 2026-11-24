@@ -23,7 +23,7 @@ class Movimiento {
 
             // 1. CONTROL DE CONCURRENCIA OPTIMISTA (OCC)
             // Consultamos la versión actual del documento bloqueando la fila durante la transacción
-            $stmtCheck = $pdo->prepare("SELECT version_occ, departamento_actual_id, total_revisiones FROM documentos WHERE id = :id FOR UPDATE");
+            $stmtCheck = $pdo->prepare("SELECT version_occ, departamento_actual_id, total_revisiones, persona_derivada FROM documentos WHERE id = :id FOR UPDATE");
             $stmtCheck->execute(['id' => $docId]);
             $docActual = $stmtCheck->fetch();
 
@@ -43,11 +43,17 @@ class Movimiento {
             $deptoDestino = !empty($datos['departamento_destino_id']) ? (int)$datos['departamento_destino_id'] : $deptoOrigen;
             $nuevoCustodio = !empty($datos['custodio_id']) ? (int)$datos['custodio_id'] : $usuarioId;
 
+            // Determinar persona derivada (si se especificó en el formulario o se actualiza)
+            $personaDerivada = array_key_exists('persona_derivada', $datos)
+                ? (!empty(trim($datos['persona_derivada'])) ? trim($datos['persona_derivada']) : null)
+                : ($docActual['persona_derivada'] ?? null);
+
             // 3. Actualizar la tabla documentos
             $stmtUpdate = $pdo->prepare("
                 UPDATE documentos SET
                     departamento_actual_id = :depto_destino,
                     custodio_id = :custodio,
+                    persona_derivada = :persona_derivada,
                     estado_tramite_id = :estado_tramite,
                     estado_resolucion_id = :estado_resolucion,
                     tiene_sello_fisico = :sello,
@@ -64,6 +70,7 @@ class Movimiento {
                 'nueva_version'      => $nuevaVersion,
                 'depto_destino'      => $deptoDestino,
                 'custodio'           => $nuevoCustodio,
+                'persona_derivada'   => $personaDerivada,
                 'estado_tramite'     => $datos['estado_tramite_id'],
                 'estado_resolucion'  => $datos['estado_resolucion_id'],
                 'sello'              => isset($datos['sello_verificado']) ? 1 : 0,
@@ -79,28 +86,29 @@ class Movimiento {
             $stmtBitacora = $pdo->prepare("
                 INSERT INTO movimientos_bitacora (
                     documento_id, departamento_origen_id, departamento_destino_id,
-                    usuario_id, accion_id, estado_tramite_id, estado_resolucion_id,
+                    usuario_id, accion_id, persona_derivada, estado_tramite_id, estado_resolucion_id,
                     observacion, sello_verificado, firma_verificada, numero_revision,
                     version_en_movimiento, fecha_registro
                 ) VALUES (
-                    :doc_id, :origen, :destino, :usuario, :accion, :est_tramite,
+                    :doc_id, :origen, :destino, :usuario, :accion, :persona_derivada, :est_tramite,
                     :est_resolucion, :obs, :sello, :firma, :revision, :version, NOW()
                 )
             ");
 
             $stmtBitacora->execute([
-                'doc_id'         => $docId,
-                'origen'         => $deptoOrigen,
-                'destino'        => $deptoDestino,
-                'usuario'        => $usuarioId,
-                'accion'         => $datos['accion_id'],
-                'est_tramite'    => $datos['estado_tramite_id'],
-                'est_resolucion' => $datos['estado_resolucion_id'],
-                'obs'            => !empty($datos['observacion']) ? trim($datos['observacion']) : null,
-                'sello'          => isset($datos['sello_verificado']) ? 1 : 0,
-                'firma'          => isset($datos['firma_verificada']) ? 1 : 0,
-                'revision'       => $nuevasRevisiones,
-                'version'        => $nuevaVersion
+                'doc_id'           => $docId,
+                'origen'           => $deptoOrigen,
+                'destino'          => $deptoDestino,
+                'usuario'          => $usuarioId,
+                'accion'           => $datos['accion_id'],
+                'persona_derivada' => $personaDerivada,
+                'est_tramite'      => $datos['estado_tramite_id'],
+                'est_resolucion'   => $datos['estado_resolucion_id'],
+                'obs'              => !empty($datos['observacion']) ? trim($datos['observacion']) : null,
+                'sello'            => isset($datos['sello_verificado']) ? 1 : 0,
+                'firma'            => isset($datos['firma_verificada']) ? 1 : 0,
+                'revision'         => $nuevasRevisiones,
+                'version'          => $nuevaVersion
             ]);
 
             $pdo->commit();

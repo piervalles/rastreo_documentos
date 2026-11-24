@@ -116,6 +116,11 @@ $titulo = "Bandeja de Documentos";
                                 <span style="display: block; font-size: 11px; color: var(--text-muted);">
                                     Custodio: <?= e($doc['custodio_nombre'] ?? 'Sin asignar') ?>
                                 </span>
+                                <?php if (!empty($doc['persona_derivada'])): ?>
+                                    <span style="display: inline-block; font-size: 11px; color: #4338ca; font-weight: 600; background: #eef2ff; border: 1px solid #c7d2fe; padding: 2px 6px; border-radius: 4px; margin-top: 3px;">
+                                        👤 <?= e($doc['persona_derivada']) ?>
+                                    </span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <span class="badge badge-<?= e($doc['estado_tramite_color']) ?>">

@@ -50,7 +50,10 @@ $titulo = "Catálogos de Estados (Trámite vs Resolución)";
                         <input type="checkbox" name="activo" id="et_activo" value="1" checked>
                         <span>Estado activo</span>
                     </label>
-                    <button type="submit" class="btn btn-primary btn-sm" style="margin-left: auto;">Guardar Estado Operativo</button>
+                    <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn_cancel_et" onclick="limpiarET()" style="display: none;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm" id="btn_submit_et">Guardar Estado Operativo</button>
+                    </div>
                 </div>
             </form>
 
@@ -125,7 +128,10 @@ $titulo = "Catálogos de Estados (Trámite vs Resolución)";
                         <input type="checkbox" name="activo" id="er_activo" value="1" checked>
                         <span>Estado activo</span>
                     </label>
-                    <button type="submit" class="btn btn-primary btn-sm" style="margin-left: auto;">Guardar Dictamen</button>
+                    <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn_cancel_er" onclick="limpiarER()" style="display: none;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm" id="btn_submit_er">Guardar Dictamen</button>
+                    </div>
                 </div>
             </form>
 
@@ -166,6 +172,18 @@ function editarET(item) {
     document.getElementById('et_color').value = item.color || 'gray';
     document.getElementById('et_desc').value = item.descripcion || '';
     document.getElementById('et_activo').checked = (item.activo == 1);
+    document.getElementById('btn_cancel_et').style.display = 'inline-block';
+    document.getElementById('btn_submit_et').textContent = 'Actualizar Estado Operativo';
+}
+
+function limpiarET() {
+    document.getElementById('et_id').value = '';
+    document.getElementById('et_nombre').value = '';
+    document.getElementById('et_color').value = 'emerald';
+    document.getElementById('et_desc').value = '';
+    document.getElementById('et_activo').checked = true;
+    document.getElementById('btn_cancel_et').style.display = 'none';
+    document.getElementById('btn_submit_et').textContent = 'Guardar Estado Operativo';
 }
 
 function editarER(item) {
@@ -174,5 +192,17 @@ function editarER(item) {
     document.getElementById('er_color').value = item.color || 'gray';
     document.getElementById('er_desc').value = item.descripcion || '';
     document.getElementById('er_activo').checked = (item.activo == 1);
+    document.getElementById('btn_cancel_er').style.display = 'inline-block';
+    document.getElementById('btn_submit_er').textContent = 'Actualizar Dictamen';
+}
+
+function limpiarER() {
+    document.getElementById('er_id').value = '';
+    document.getElementById('er_nombre').value = '';
+    document.getElementById('er_color').value = 'emerald';
+    document.getElementById('er_desc').value = '';
+    document.getElementById('er_activo').checked = true;
+    document.getElementById('btn_cancel_er').style.display = 'none';
+    document.getElementById('btn_submit_er').textContent = 'Guardar Dictamen';
 }
 </script>

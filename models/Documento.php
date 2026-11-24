@@ -29,6 +29,7 @@ class Documento {
         try {
             // Folio: usar el ingresado manualmente o generar uno automático
             $folio = !empty($datos['folio_manual']) ? trim($datos['folio_manual']) : self::generarFolio();
+            $personaDerivada = !empty($datos['persona_derivada']) ? trim($datos['persona_derivada']) : null;
 
             // Verificar que no exista el folio
             $check = $pdo->prepare("SELECT id FROM documentos WHERE folio_unico = :folio");
@@ -42,12 +43,12 @@ class Documento {
                 INSERT INTO documentos (
                     folio_unico, asunto, remitente, entidad_origen, tipo_id,
                     estado_tramite_id, estado_resolucion_id, departamento_actual_id,
-                    custodio_id, documento_padre_id, version_occ, tiene_sello_fisico,
+                    custodio_id, persona_derivada, documento_padre_id, version_occ, tiene_sello_fisico,
                     tiene_firma_fisica, total_revisiones, observaciones_iniciales
                 ) VALUES (
                     :folio, :asunto, :remitente, :entidad, :tipo_id,
                     :estado_tramite, :estado_resolucion, :departamento,
-                    :custodio, :padre_id, 1, :sello, :firma, 1, :observaciones
+                    :custodio, :persona_derivada, :padre_id, 1, :sello, :firma, 1, :observaciones
                 )
             ");
 
@@ -61,6 +62,7 @@ class Documento {
                 'estado_resolucion' => $datos['estado_resolucion_id'],
                 'departamento'      => $datos['departamento_actual_id'],
                 'custodio'          => $usuarioId,
+                'persona_derivada'  => $personaDerivada,
                 'padre_id'          => !empty($datos['documento_padre_id']) ? (int)$datos['documento_padre_id'] : null,
                 'sello'             => isset($datos['tiene_sello_fisico']) ? 1 : 0,
                 'firma'             => isset($datos['tiene_firma_fisica']) ? 1 : 0,
@@ -73,27 +75,36 @@ class Documento {
             $stmtBitacora = $pdo->prepare("
                 INSERT INTO movimientos_bitacora (
                     documento_id, departamento_origen_id, departamento_destino_id,
-                    usuario_id, accion_id, estado_tramite_id, estado_resolucion_id,
+                    usuario_id, accion_id, persona_derivada, estado_tramite_id, estado_resolucion_id,
                     observacion, sello_verificado, firma_verificada, numero_revision,
                     version_en_movimiento, fecha_registro
                 ) VALUES (
-                    :doc_id, :origen, :destino, :usuario, :accion, :est_tramite,
+                    :doc_id, :origen, :destino, :usuario, :accion, :persona_derivada, :est_tramite,
                     :est_resolucion, :obs, :sello, :firma, 1, 1, NOW()
                 )
             ");
 
             // Acción por defecto: Registro Inicial (ID 1)
+            $obsInicial = 'Ingreso y registro inicial del expediente físico en el sistema.';
+            if ($personaDerivada) {
+                $obsInicial .= " Derivado a: {$personaDerivada}.";
+            }
+            if (!empty($datos['observaciones'])) {
+                $obsInicial .= " " . trim($datos['observaciones']);
+            }
+
             $stmtBitacora->execute([
-                'doc_id'         => $documentoId,
-                'origen'         => $datos['departamento_actual_id'],
-                'destino'        => $datos['departamento_actual_id'],
-                'usuario'        => $usuarioId,
-                'accion'         => 1, // Registro Inicial
-                'est_tramite'    => $datos['estado_tramite_id'],
-                'est_resolucion' => $datos['estado_resolucion_id'],
-                'obs'            => 'Ingreso y registro inicial del expediente físico en el sistema.',
-                'sello'          => isset($datos['tiene_sello_fisico']) ? 1 : 0,
-                'firma'          => isset($datos['tiene_firma_fisica']) ? 1 : 0
+                'doc_id'           => $documentoId,
+                'origen'           => $datos['departamento_actual_id'],
+                'destino'          => $datos['departamento_actual_id'],
+                'usuario'          => $usuarioId,
+                'accion'           => 1, // Registro Inicial
+                'persona_derivada' => $personaDerivada,
+                'est_tramite'      => $datos['estado_tramite_id'],
+                'est_resolucion'   => $datos['estado_resolucion_id'],
+                'obs'              => $obsInicial,
+                'sello'            => isset($datos['tiene_sello_fisico']) ? 1 : 0,
+                'firma'            => isset($datos['tiene_firma_fisica']) ? 1 : 0
             ]);
 
             $pdo->commit();
@@ -137,7 +148,7 @@ class Documento {
     public static function listarHijos(int $padreId): array {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("
-            SELECT d.id, d.folio_unico, d.asunto, d.remitente, d.created_at,
+            SELECT d.id, d.folio_unico, d.asunto, d.remitente, d.persona_derivada, d.created_at,
                    et.nombre AS estado_tramite_nombre, et.color AS estado_tramite_color,
                    dep.nombre AS departamento_nombre
             FROM documentos d

@@ -46,7 +46,16 @@ $titulo = "Expediente: " . $documento['folio_unico'];
             <div style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-top: 4px;">
                 🏢 <?= e($documento['departamento_nombre']) ?> (<?= e($documento['departamento_codigo']) ?>)
             </div>
-            <span style="font-size: 12px; color: var(--text-muted);">Custodio: <?= e($documento['custodio_nombre'] ?? 'Sin asignar') ?></span>
+            <span style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 2px;">Custodio: <?= e($documento['custodio_nombre'] ?? 'Sin asignar') ?></span>
+            <?php if (!empty($documento['persona_derivada'])): ?>
+                <div style="margin-top: 8px; font-size: 12px; color: #4338ca; font-weight: 600; background: #eef2ff; border: 1px solid #c7d2fe; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                    👤 Derivado a: <?= e($documento['persona_derivada']) ?>
+                </div>
+            <?php else: ?>
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 6px;">
+                    👤 <em>Sin derivación a personal específico</em>
+                </span>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -182,6 +191,20 @@ $titulo = "Expediente: " . $documento['folio_unico'];
                 </div>
             </div>
 
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label">
+                        👤 Derivar a / Personal Encargado (Nombre Completo):
+                    </label>
+                    <input type="text" name="persona_derivada" class="form-control" 
+                           value="<?= e($documento['persona_derivada'] ?? '') ?>" 
+                           placeholder="Ej. Lic. Carlos Mendoza Flores / Ing. Roberto Paredes">
+                    <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+                        Especifica el nombre completo del personal a quien se deriva o encarga el documento. Si regresa a secretaría o cambia de encargado, actualiza o vacía este campo.
+                    </span>
+                </div>
+            </div>
+
             <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                 <label class="form-label">Comprobaciones Físicas al momento de este movimiento:</label>
                 <div style="display: flex; gap: 24px; margin-top: 6px;">
@@ -197,8 +220,8 @@ $titulo = "Expediente: " . $documento['folio_unico'];
             </div>
 
             <div class="form-group">
-                <label class="form-label">Observaciones del Movimiento (opcional):</label>
-                <textarea name="observacion" class="form-control" rows="2" placeholder="Ej. Se remite para opinión legal con 15 folios útiles adjuntos..."></textarea>
+                <label class="form-label">Observaciones o Indicaciones de Derivación / Movimiento (opcional):</label>
+                <textarea name="observacion" class="form-control" rows="2" placeholder="Ej. Derivado para emisión de informe técnico con plazo de 48 horas..."></textarea>
             </div>
 
             <div style="display: flex; justify-content: flex-end;">
@@ -237,6 +260,12 @@ $titulo = "Expediente: " . $documento['folio_unico'];
                                 <?= e($mov['depto_origen_nombre']) ?> → <strong><?= e($mov['depto_destino_nombre']) ?></strong>
                             </span>
                         </div>
+
+                        <?php if (!empty($mov['persona_derivada'])): ?>
+                            <div style="font-size: 12px; color: #4338ca; background: #eef2ff; border-left: 3px solid #6366f1; padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span>👤 <strong>Derivado a:</strong> <?= e($mov['persona_derivada']) ?></span>
+                            </div>
+                        <?php endif; ?>
 
                         <?php if (!empty($mov['observacion'])): ?>
                             <p style="font-size: 13px; color: #334155; margin-bottom: 8px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #cbd5e1;">
