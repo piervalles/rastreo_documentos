@@ -5,29 +5,115 @@
 $titulo = "Administración de Áreas y Departamentos";
 ?>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start;">
-    <!-- FORMULARIO CREAR / EDITAR -->
-    <div class="card" style="position: sticky; top: 80px;">
-        <div class="card-header">
-            <h3 id="form-titulo">Nueva Área / Departamento</h3>
+<!-- LISTADO A ANCHO COMPLETO -->
+<div class="card" style="width: 100%;">
+    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 24px;">
+        <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">Catálogo de Departamentos Registrados</h3>
+            <span style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 2px;">
+                <?= count($departamentos) ?> áreas configuradas en el sistema institucional
+            </span>
         </div>
-        <div class="card-body">
-            <!-- AVISO SUTIL PARA ÁREAS BASE DEL SISTEMA -->
-            <div id="aviso-sistema-edicion" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #1e40af; line-height: 1.4;">
-                <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <span style="font-size: 16px; line-height: 1;">🛡️</span>
-                    <div>
-                        <strong>Área Base Protegida del Sistema</strong>
-                        <p style="margin-top: 3px; color: #2563eb; font-size: 11.5px; line-height: 1.35;">
-                            El nombre y código de esta área son estructurales y no se pueden modificar. Puedes <strong>activar o desactivar</strong> su disponibilidad operativa para controlar si se muestra al crear o derivar documentos.
-                        </p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="abrirModalNuevoDepto()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Nueva Área
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Código</th>
+                    <th style="width: 250px;">Nombre del Área</th>
+                    <th style="width: 130px;">Tipo</th>
+                    <th>Descripción / Funciones</th>
+                    <th style="width: 120px;">Estado</th>
+                    <th style="width: 180px; text-align: right;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($departamentos)): ?>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No hay departamentos registrados en el catálogo institucional.
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($departamentos as $d): ?>
+                        <tr>
+                            <td>
+                                <span style="font-family: monospace; font-weight: 700; font-size: 13px; color: var(--text-main); background: #f1f5f9; padding: 3px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                                    <?= e($d['codigo']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <strong style="color: var(--text-main); font-size: 13.5px;"><?= e($d['nombre']) ?></strong>
+                            </td>
+                            <td>
+                                <?php if (!empty($d['es_sistema'])): ?>
+                                    <span class="badge badge-blue" title="Área estructural base del sistema">🛡️ Base</span>
+                                <?php else: ?>
+                                    <span class="badge badge-slate" title="Área creada por usuarios">Personalizada</span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 12.5px;">
+                                <?= e($d['descripcion'] ?? '—') ?>
+                            </td>
+                            <td>
+                                <span class="badge <?= $d['activo'] ? 'badge-emerald' : 'badge-slate' ?>">
+                                    <?= $d['activo'] ? '● Activo' : '○ Inactivo' ?>
+                                </span>
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <div style="display: inline-flex; gap: 6px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="editarDepto(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)">
+                                        Editar
+                                    </button>
+
+                                    <?php if (!empty($d['es_sistema'])): ?>
+                                        <button type="button" class="btn btn-secondary btn-sm" style="color: #94a3b8; border-color: #e2e8f0;" onclick="alertaDeptoSistema(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)" title="Área base protegida">
+                                            🔒 Eliminar
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="solicitarEliminarDepto(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)">
+                                            Eliminar
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL EMERGENTE: FORMULARIO CREAR / EDITAR ÁREA -->
+<div id="modal-form-depto" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px); padding: 16px;">
+    <div style="background: #ffffff; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25); overflow: hidden; animation: popIn 0.2s ease;">
+        <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+            <h3 id="form-titulo" style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Nueva Área / Departamento</h3>
+            <button type="button" onclick="cerrarModalFormDepto()" style="background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+        </div>
+
+        <form method="POST" action="index.php?c=admin&a=guardarDepartamento" id="form-depto" style="margin: 0;">
+            <?= Seguridad::inputCsrf() ?>
+            <input type="hidden" name="id" id="depto_id">
+
+            <div style="padding: 22px 24px; max-height: calc(85vh - 130px); overflow-y: auto;">
+                <!-- AVISO SUTIL PARA ÁREAS BASE DEL SISTEMA -->
+                <div id="aviso-sistema-edicion" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #1e40af; line-height: 1.4;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="font-size: 16px; line-height: 1;">🛡️</span>
+                        <div>
+                            <strong>Área Base Protegida del Sistema</strong>
+                            <p style="margin-top: 3px; color: #2563eb; font-size: 11.5px; line-height: 1.35;">
+                                El nombre y código de esta área son estructurales y no se pueden modificar. Puedes <strong>activar o desactivar</strong> su disponibilidad operativa para controlar si se muestra al crear o derivar documentos.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <form method="POST" action="index.php?c=admin&a=guardarDepartamento" id="form-depto">
-                <?= Seguridad::inputCsrf() ?>
-                <input type="hidden" name="id" id="depto_id">
 
                 <div class="form-group">
                     <label class="form-label" id="label-nombre">Nombre del Área: *</label>
@@ -46,7 +132,7 @@ $titulo = "Administración de Áreas y Departamentos";
                     <textarea name="descripcion" id="depto_desc" class="form-control" rows="2" placeholder="Funciones principales del área..."></textarea>
                 </div>
 
-                <div class="form-group" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div class="form-group" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 0;">
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
                         <input type="checkbox" name="activo" id="depto_activo" value="1" checked style="width: 16px; height: 16px;">
                         <div>
@@ -57,103 +143,19 @@ $titulo = "Administración de Áreas y Departamentos";
                         </div>
                     </label>
                 </div>
-
-                <div style="display: flex; gap: 8px; margin-top: 18px;">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="limpiarFormDepto()">Cancelar / Limpiar</button>
-                    <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-depto" style="flex-grow: 1;">Guardar Área</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- LISTADO -->
-    <div class="card">
-        <div class="card-header">
-            <div>
-                <h3>Catálogo de Departamentos Registrados</h3>
-                <span style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 2px;">
-                    <?= count($departamentos) ?> áreas configuradas en el sistema
-                </span>
             </div>
-            <button type="button" class="btn btn-primary btn-sm" onclick="limpiarFormDepto()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Nueva Área
-            </button>
-        </div>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre del Área</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                        <th>Estado</th>
-                        <th style="text-align: right;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($departamentos)): ?>
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
-                                No hay departamentos registrados en el catálogo.
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($departamentos as $d): ?>
-                            <tr>
-                                <td>
-                                    <span style="font-family: monospace; font-weight: 700; font-size: 13px; color: var(--text-main);">
-                                        <?= e($d['codigo']) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <strong style="color: var(--text-main); display: block;"><?= e($d['nombre']) ?></strong>
-                                </td>
-                                <td>
-                                    <?php if (!empty($d['es_sistema'])): ?>
-                                        <span class="badge badge-blue" title="Área estructural base del sistema">🛡️ Base</span>
-                                    <?php else: ?>
-                                        <span class="badge badge-slate" title="Área creada por usuarios">Personalizada</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td style="color: var(--text-muted); font-size: 12px; max-width: 200px;">
-                                    <?= e($d['descripcion'] ?? '—') ?>
-                                </td>
-                                <td>
-                                    <span class="badge <?= $d['activo'] ? 'badge-emerald' : 'badge-slate' ?>">
-                                        <?= $d['activo'] ? '● Activo' : '○ Inactivo' ?>
-                                    </span>
-                                </td>
-                                <td style="text-align: right; white-space: nowrap;">
-                                    <div style="display: inline-flex; gap: 6px;">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarDepto(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)">
-                                            Editar
-                                        </button>
 
-                                        <?php if (!empty($d['es_sistema'])): ?>
-                                            <button type="button" class="btn btn-secondary btn-sm" style="color: #94a3b8; border-color: #e2e8f0;" onclick="alertaDeptoSistema(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)" title="Área base protegida">
-                                                🔒 Eliminar
-                                            </button>
-                                        <?php else: ?>
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="solicitarEliminarDepto(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)">
-                                                Eliminar
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+            <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalFormDepto()">Cancelar</button>
+                <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-depto">Guardar Área</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- MODAL EMERGENTE: ÁREA PROTEGIDA DEL SISTEMA -->
-<div id="modal-sistema" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
-    <div style="background: #ffffff; border-radius: 12px; max-width: 480px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden; animation: popIn 0.2s ease;">
+<div id="modal-sistema" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px); padding: 16px;">
+    <div style="background: #ffffff; border-radius: 12px; max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25); overflow: hidden; animation: popIn 0.2s ease;">
         <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: flex-start; gap: 14px;">
             <div style="width: 40px; height: 40px; border-radius: 8px; background: #eff6ff; border: 1px solid #bfdbfe; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
                 🛡️
@@ -179,8 +181,8 @@ $titulo = "Administración de Áreas y Departamentos";
 </div>
 
 <!-- MODAL EMERGENTE: CONFIRMACIÓN DE ELIMINACIÓN DE ÁREA PERSONALIZADA -->
-<div id="modal-eliminar" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
-    <div style="background: #ffffff; border-radius: 12px; max-width: 460px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden; animation: popIn 0.2s ease;">
+<div id="modal-eliminar" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(2px); padding: 16px;">
+    <div style="background: #ffffff; border-radius: 12px; max-width: 460px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25); overflow: hidden; animation: popIn 0.2s ease;">
         <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: flex-start; gap: 14px;">
             <div style="width: 40px; height: 40px; border-radius: 8px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
                 ⚠️
@@ -218,6 +220,16 @@ $titulo = "Administración de Áreas y Departamentos";
 
 <script>
 let deptoEnEdicion = null;
+
+function abrirModalNuevoDepto() {
+    limpiarFormDepto();
+    document.getElementById('modal-form-depto').style.display = 'flex';
+    document.getElementById('depto_nombre').focus();
+}
+
+function cerrarModalFormDepto() {
+    document.getElementById('modal-form-depto').style.display = 'none';
+}
 
 function editarDepto(d) {
     deptoEnEdicion = d;
@@ -262,7 +274,12 @@ function editarDepto(d) {
         btnSubmit.innerText = 'Guardar Cambios';
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('modal-form-depto').style.display = 'flex';
+    if (esSistema) {
+        document.getElementById('depto_activo').focus();
+    } else {
+        document.getElementById('depto_nombre').focus();
+    }
 }
 
 function limpiarFormDepto() {
@@ -296,7 +313,6 @@ function alertaDeptoSistema(d) {
     btnDesactivar.onclick = function() {
         cerrarModalSistema();
         editarDepto(d);
-        document.getElementById('depto_activo').focus();
     };
     const modal = document.getElementById('modal-sistema');
     modal.style.display = 'flex';
@@ -320,8 +336,20 @@ function cerrarModalEliminar() {
 // Cerrar modales con tecla Escape
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+        cerrarModalFormDepto();
         cerrarModalSistema();
         cerrarModalEliminar();
     }
+});
+
+// Cerrar modal al hacer clic en el fondo oscuro exterior
+window.addEventListener('click', function(e) {
+    const modalForm = document.getElementById('modal-form-depto');
+    const modalSistema = document.getElementById('modal-sistema');
+    const modalEliminar = document.getElementById('modal-eliminar');
+
+    if (e.target === modalForm) cerrarModalFormDepto();
+    if (e.target === modalSistema) cerrarModalSistema();
+    if (e.target === modalEliminar) cerrarModalEliminar();
 });
 </script>
