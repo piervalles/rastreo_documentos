@@ -179,9 +179,16 @@ class Documento {
             $params['depto_id'] = $departamentoId;
         }
 
-        if (!empty($filtros['buscar'])) {
-            $sql .= " AND (d.folio_unico LIKE :buscar OR d.asunto LIKE :buscar OR d.remitente LIKE :buscar)";
-            $params['buscar'] = '%' . trim($filtros['buscar']) . '%';
+        if (isset($filtros['buscar']) && trim($filtros['buscar']) !== '') {
+            $sql .= " AND (d.folio_unico LIKE :buscar1 OR d.remitente LIKE :buscar2)";
+            $termino = '%' . trim($filtros['buscar']) . '%';
+            $params['buscar1'] = $termino;
+            $params['buscar2'] = $termino;
+        }
+
+        if (isset($filtros['asunto']) && trim($filtros['asunto']) !== '') {
+            $sql .= " AND LOWER(TRIM(d.asunto)) = LOWER(TRIM(:asunto))";
+            $params['asunto'] = trim($filtros['asunto']);
         }
 
         if (!empty($filtros['estado_tramite_id'])) {
@@ -209,5 +216,20 @@ class Documento {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Obtiene la lista única de asuntos registrados en los documentos
+     */
+    public static function listarAsuntosUnicos(): array {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->query("
+            SELECT MIN(TRIM(asunto)) AS asunto
+            FROM documentos
+            WHERE asunto IS NOT NULL AND TRIM(asunto) != ''
+            GROUP BY LOWER(TRIM(asunto))
+            ORDER BY asunto ASC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }

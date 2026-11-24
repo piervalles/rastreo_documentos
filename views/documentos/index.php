@@ -20,8 +20,20 @@ $titulo = "Bandeja de Documentos";
 
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Buscar por Folio, Asunto o Remitente:</label>
-                    <input type="text" name="buscar" class="form-control" placeholder="Ej. EXP-2026-0001, Oficio..." value="<?= e($_GET['buscar'] ?? '') ?>">
+                    <label class="form-label">Buscar por Folio o Remitente:</label>
+                    <input type="text" name="buscar" class="form-control" placeholder="Ej. EXP-2026-0001, Juan Pérez..." value="<?= e($_GET['buscar'] ?? '') ?>">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Filtrar por Asunto:</label>
+                    <select name="asunto" class="form-control">
+                        <option value="">-- Todos los Asuntos --</option>
+                        <?php foreach ($asuntos as $as): ?>
+                            <option value="<?= e($as) ?>" <?= (($_GET['asunto'] ?? '') === $as) ? 'selected' : '' ?>>
+                                <?= e($as) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <?php if (Seguridad::esAdmin()): ?>
