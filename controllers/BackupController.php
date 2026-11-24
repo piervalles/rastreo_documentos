@@ -15,7 +15,42 @@ class BackupController {
     }
 
     public function index(): void {
-        View::render('admin/respaldos', [], 'Copias de Seguridad');
+        $info = [
+            'tamano_formateado' => '0 KB',
+            'tablas'            => 0,
+            'total_filas'       => 0
+        ];
+
+        try {
+            $pdo = Database::getConnection();
+            $config = require __DIR__ . '/../config/database.php';
+            $stmt = $pdo->prepare("
+                SELECT 
+                    SUM(data_length + index_length) AS bytes,
+                    COUNT(*) AS total_tablas,
+                    SUM(table_rows) AS total_filas
+                FROM information_schema.tables 
+                WHERE table_schema = ?
+            ");
+            $stmt->execute([$config['database']]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row && $row['bytes'] !== null) {
+                $bytes = (float)$row['bytes'];
+                if ($bytes >= 1048576) {
+                    $tamano = number_format($bytes / 1048576, 2) . ' MB';
+                } else {
+                    $tamano = number_format($bytes / 1024, 1) . ' KB';
+                }
+                $info['tamano_formateado'] = $tamano;
+                $info['tablas']            = (int)$row['total_tablas'];
+                $info['total_filas']       = (int)$row['total_filas'];
+            }
+        } catch (Exception $e) {
+            // Silencioso, mantiene valores por defecto
+        }
+
+        View::render('admin/respaldos', compact('info'), 'Copias de Seguridad');
     }
 
     /**
